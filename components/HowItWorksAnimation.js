@@ -4,7 +4,7 @@ export default function HowItWorksAnimation() {
   const listItems = [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5];
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="bg-[#FAFAF7] mx-auto max-w-3xl">
       <style>{`
         @keyframes hiw-pill {
           0% { opacity: 0; transform: translateY(6px); }
