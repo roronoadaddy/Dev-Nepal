@@ -9,7 +9,7 @@ const DEVELOPERS = [
 
 export default function FoundingDevelopers() {
   return (
-    <section className="border-b border-black bg-white px-4 py-16 sm:px-6 sm:py-20">
+    <section className="border-b border-black bg-[#FAFAF7] px-4 py-16 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-medium uppercase tracking-widest text-black/40">
           Founding developers
