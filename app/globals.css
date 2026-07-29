@@ -26,3 +26,16 @@ body {
 html::-webkit-scrollbar{
   display: none;
 }
+#loginholder{
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(30,136,229,.15),
+      rgba(26,26,26,.05)
+    ),
+    url('/loginbg.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

@@ -72,20 +72,20 @@ export default function Hero() {
 
       {/* Dual CTAs — one per audience */}
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-        <button
-          type="button"
+        <a
+          href="/join"
           className="hover:shadow-lg cursor-pointer flex items-center gap-2 rounded-full border border-[#1E88E5] bg-[#1E88E5] px-5 py-2 text-sm font-medium text-white transition-colors hover:border-[#F5A623] hover:bg-[#F5A623] hover:text-[#1A1A1A]"
         >
           <Code2 size={16} />
           I&apos;m a developer
-        </button>
-        <button
-          type="button"
+        </a>
+        <a
+          href="/profiles"
           className="hover:shadow-lg cursor-pointer flex items-center gap-2 rounded-full border border-[#1A1A1A]/20 px-5 py-2 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1E88E5] hover:text-[#1E88E5]"
         >
           <Briefcase size={16} />
           I need a developer
-        </button>
+        </a>
       </div>
 
       {/* Signature element — live proof ticker */}
