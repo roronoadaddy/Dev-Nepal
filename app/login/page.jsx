@@ -1,16 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import { login } from "./login";
+import { useActionState, useState } from "react";
 import Logo from "../../components/logo";
+import { handleGithubLogin, handleGoogleLogin } from "./oauths";
+
+const initialState = { error: "" };
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // handle login logic here
-    console.log("Email:", email, "Password:", password);
-  };
+  const [state, formAction, pending] = useActionState(login, initialState);
 
   return (
     <div id="loginholder" className="min-h-screen overflow-hidden bg-[#FAFAF7] px-4 py-6 sm:px-6 lg:px-8">
@@ -56,13 +55,21 @@ const LoginPage = () => {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+              <form action={formAction} className="space-y-4 sm:space-y-5">
+                {state.error ? (
+                  <div className="rounded-xl border border-[#F5A623]/40 bg-[#FFFBF0] px-4 py-3 text-sm text-[#A46000]">
+                    {state.error}
+                  </div>
+                ) : null}
+
                 <div>
                   <label htmlFor="email" className="mb-1.5 block text-sm font-medium tracking-wide text-[#1A1A1A]/70">
                     Email address
                   </label>
                   <input
+                  required
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="you@devnepal.com"
                     value={email}
@@ -81,7 +88,9 @@ const LoginPage = () => {
                     </a>
                   </div>
                   <input
+                  required
                     id="password"
+                    name="password"
                     type="password"
                     placeholder="••••••••"
                     value={password}
@@ -92,9 +101,10 @@ const LoginPage = () => {
 
                 <button
                   type="submit"
-                  className="mt-2 w-full cursor-pointer rounded-xl bg-[#1E88E5] py-3.5 text-base font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#F5A623] hover:text-[#1A1A1A] hover:shadow-[0_0_30px_-8px_rgba(245,166,35,0.5)] active:scale-[0.98] sm:py-4"
+                  disabled={pending}
+                  className="mt-2 w-full cursor-pointer rounded-xl bg-[#1E88E5] py-3.5 text-base font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#F5A623] hover:text-[#1A1A1A] hover:shadow-[0_0_30px_-8px_rgba(245,166,35,0.5)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:py-4"
                 >
-                  Sign in
+                  {pending ? "Signing in..." : "Sign in"}
                 </button>
 
                 <div className="relative my-4 flex items-center">
@@ -105,6 +115,7 @@ const LoginPage = () => {
 
                 <div className="space-y-3 sm:space-y-3.5 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
                   <button
+                  onClick={handleGoogleLogin}
                     type="button"
                     className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-[#1A1A1A]/15 bg-white py-3.5 text-sm font-medium text-[#1A1A1A]/80 transition-all duration-200 hover:border-[#1A1A1A]/25 hover:bg-[#1A1A1A]/3"
                   >
@@ -131,6 +142,7 @@ const LoginPage = () => {
 
                   <button
                     type="button"
+                    onClick={handleGithubLogin}
                     className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-[#1A1A1A]/15 bg-white py-3.5 text-sm font-medium text-[#1A1A1A]/80 transition-all duration-200 hover:border-[#1A1A1A]/25 hover:bg-[#1A1A1A]/3"
                   >
                     <svg className="h-5 w-5 text-[#1A1A1A]" fill="currentColor" viewBox="0 0 24 24">

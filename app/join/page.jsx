@@ -1,17 +1,69 @@
 "use client";
-import React, { useState } from "react";
+import { useState, useActionState, startTransition } from "react";
 import Logo from "../../components/logo";
+import { handleGithubLogin, handleGoogleLogin } from "./oauths";
+import { signup } from "./signup";
 
 const JoinPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [state, formAction] = useActionState(signup, { error: null });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Name:", name, "Email:", email, "Password:", password, "Confirm Password:", confirmPassword);
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("email", email);
+  formData.append("password", password);
+
+  startTransition(() => {
+    formAction(formData);
+  });
+};
+
+
+  const getFieldClasses = (field) =>
+    `w-full rounded-xl border px-4 py-3.5 text-sm transition-all duration-200 placeholder-[#1A1A1A]/30 focus:outline-none ${
+      errors[field]
+        ? "border-[#F5A623]/90 bg-[#FFFBF0] text-[#1A1A1A] focus:border-[#F5A623] focus:ring-[#F5A623]/20"
+        : "border-[#1A1A1A]/15 bg-white text-[#1A1A1A] focus:border-[#1E88E5] focus:ring-[#1E88E5]/25"
+    }`;
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Please enter your full name.";
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Please enter your email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Use a valid email like you@devnepal.com.";
+    }
+
+    if (!password) {
+      newErrors.password = "Set a secure password.";
+    } else if (password.length < 8) {
+      newErrors.password = "Password should be at least 8 characters.";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm your password.";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords must match.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
+
 
   return (
     <div id="loginholder" className="min-h-screen overflow-hidden bg-[#FAFAF7] px-4 py-6 sm:px-6 lg:px-8">
@@ -58,19 +110,28 @@ const JoinPage = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                {state?.error && (
+        <p className="text-sm text-red-600">{state.error}</p>
+      )}
+
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div>
                     <label htmlFor="name" className="mb-1.5 block text-sm font-medium tracking-wide text-[#1A1A1A]/70">
                       Full name
                     </label>
                     <input
+                      required
                       id="name"
+                      name="name"
                       type="text"
                       placeholder="Aarav Sharma"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-[#1A1A1A]/15 bg-white px-4 py-3.5 text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/30 transition-all duration-200 focus:border-[#1E88E5] focus:outline-none focus:ring-2 focus:ring-[#1E88E5]/25"
+                      className={getFieldClasses("name")}
                     />
+                    {errors.name && (
+                      <p className="mt-2 text-sm text-[#F5A623]">{errors.name}</p>
+                    )}
                   </div>
 
                   <div>
@@ -79,12 +140,17 @@ const JoinPage = () => {
                     </label>
                     <input
                       id="email"
+                      name="email"
                       type="email"
+                      required
                       placeholder="you@devnepal.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-[#1A1A1A]/15 bg-white px-4 py-3.5 text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/30 transition-all duration-200 focus:border-[#1E88E5] focus:outline-none focus:ring-2 focus:ring-[#1E88E5]/25"
+                      className={getFieldClasses("email")}
                     />
+                    {errors.email && (
+                      <p className="mt-2 text-sm text-[#F5A623]">{errors.email}</p>
+                    )}
                   </div>
                 </div>
 
@@ -95,12 +161,17 @@ const JoinPage = () => {
                     </label>
                     <input
                       id="password"
+                      name="password"
+                      required
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#1A1A1A]/15 bg-white px-4 py-3.5 text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/30 transition-all duration-200 focus:border-[#1E88E5] focus:outline-none focus:ring-2 focus:ring-[#1E88E5]/25"
+                      className={getFieldClasses("password")}
                     />
+                    {errors.password && (
+                      <p className="mt-2 text-sm text-[#F5A623]">{errors.password}</p>
+                    )}
                   </div>
 
                   <div>
@@ -109,18 +180,22 @@ const JoinPage = () => {
                     </label>
                     <input
                       id="confirmPassword"
+                      required
                       type="password"
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#1A1A1A]/15 bg-white px-4 py-3.5 text-sm text-[#1A1A1A] placeholder-[#1A1A1A]/30 transition-all duration-200 focus:border-[#1E88E5] focus:outline-none focus:ring-2 focus:ring-[#1E88E5]/25"
+                      className={getFieldClasses("confirmPassword")}
                     />
+                    {errors.confirmPassword && (
+                      <p className="mt-2 text-sm text-[#F5A623]">{errors.confirmPassword}</p>
+                    )}
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="mt-2 w-full cursor-pointer rounded-xl bg-[#1E88E5] py-3.5 text-base font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#F5A623] hover:text-[#1A1A1A] hover:shadow-[0_0_30px_-8px_rgba(245,166,35,0.5)] active:scale-[0.98] sm:py-4"
+                  className="mt-2 w-full cursor-pointer rounded-xl bg-[#1E88E5] py-3.5 text-base font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#F5A623] hover:text-[#1A1A1A] hover:shadow-[0_0_30px_-8px_rgba(245,166,35,0.5)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:py-4"
                 >
                   Create account
                 </button>
@@ -133,6 +208,7 @@ const JoinPage = () => {
 
                 <div className="space-y-3 sm:space-y-3.5 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
                   <button
+                  onClick={handleGoogleLogin}
                     type="button"
                     className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-[#1A1A1A]/15 bg-white py-3.5 text-sm font-medium text-[#1A1A1A]/80 transition-all duration-200 hover:border-[#1A1A1A]/25 hover:bg-[#1A1A1A]/3"
                   >
@@ -158,6 +234,7 @@ const JoinPage = () => {
                   </button>
 
                   <button
+                  onClick={handleGithubLogin}
                     type="button"
                     className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-[#1A1A1A]/15 bg-white py-3.5 text-sm font-medium text-[#1A1A1A]/80 transition-all duration-200 hover:border-[#1A1A1A]/25 hover:bg-[#1A1A1A]/3"
                   >
